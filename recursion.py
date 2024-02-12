@@ -54,6 +54,3 @@ def giveChange(amount, coins):
 
 if __name__ == "__main__":
     print("HW2 - Recursion: Get Change \nList of available functions - change, giveChange")
-    print(giveChange(48, [1,5,10,25,50])) # 6
-    print(giveChange(48, [1,7,24,42])) # 2
-    print(giveChange(6, [4,5,9])) # 2
