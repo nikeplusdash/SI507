@@ -298,6 +298,7 @@ class Game:
         self.__curPlayer = self.__playerList[0]
         print('Starting a new round')
         while not curWinnerNotation:
+            print(self.__curPlayer.display())
             self.__board.display()
             self.__playBoard(self.__curPlayer)
             curWinnerNotation = self.__board.checkWin(self.__connectN)
