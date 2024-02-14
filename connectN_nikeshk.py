@@ -149,9 +149,14 @@ class Board:
         Returns:
             Notation or None: The notation of the winning player, or None if there is no winner.
         """
-        winnerP1 = (None, Notation.PLAYER1)[any(list(map(lambda x: x.count(Notation.PLAYER1) == target, self.__grid)))]
-        winnerP2 = (None, Notation.PLAYER2)[any(list(map(lambda x: x.count(Notation.PLAYER2) == target, self.__grid)))]
-        return winnerP1 or winnerP2
+        for row in range(self.__rowNum):
+            for col in range(self.__colNum):
+                if self.__grid[row][col] == Notation.EMPTY:
+                    continue
+                if col <= self.__colNum - target:
+                    if all([self.__grid[row][col + i] == self.__grid[row][col] for i in range(target)]):
+                        return self.__grid[row][col]
+        return None
 
     def __checkWinVertical(self, target):
         """Checks if there is a winning condition in the vertical direction.
@@ -162,10 +167,14 @@ class Board:
         Returns:
             Notation or None: The notation of the winning player, or None if there is no winner.
         """
-        transpose_grid = list(map(list, zip(*self.__grid)))
-        winnerP1 = (None, Notation.PLAYER1)[any(list(map(lambda x: x.count(Notation.PLAYER1) == target, transpose_grid)))]
-        winnerP2 = (None, Notation.PLAYER2)[any(list(map(lambda x: x.count(Notation.PLAYER2) == target, transpose_grid)))]        
-        return winnerP1 or winnerP2
+        for col in range(self.__colNum):
+            for row in range(self.__rowNum):
+                if self.__grid[row][col] == Notation.EMPTY:
+                    continue
+                if row <= self.__rowNum - target:
+                    if all([self.__grid[row+i][col] == self.__grid[row][col] for i in range(target)]):
+                        return self.__grid[row][col]
+        return None
 
     def __checkWinOneDiag(self, target, rowNum, colNum):
         """Checks if there is a winning condition in the diagonal direction from the current cell.
@@ -289,7 +298,6 @@ class Game:
         self.__curPlayer = self.__playerList[0]
         print('Starting a new round')
         while not curWinnerNotation:
-            print(self.__curPlayer.display())
             self.__board.display()
             self.__playBoard(self.__curPlayer)
             curWinnerNotation = self.__board.checkWin(self.__connectN)
