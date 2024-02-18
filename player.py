@@ -1,6 +1,6 @@
-from media import Media, Track, Movie
-from linked_list import LinkedList
 import json
+from linked_list import LinkedList
+from media import Media, Track, Movie
 
 class Player:
     """
@@ -57,7 +57,7 @@ class Player:
             True if the media was successfully removed, False otherwise.
         """
         if self.playlist.deleteAtIndex(index):
-            if self._isNodeUnbound(self.currentMediaNode):
+            if self.playlist._isNodeUnbound(self.currentMediaNode):
                 self.currentMediaNode = self.currentMediaNode.next
             return True
         return False
@@ -73,7 +73,7 @@ class Player:
         bool
             True if the player successfully moved to the next media, False otherwise.
         """
-        if self.currentMediaNode is None or self.currentMediaNode.next is None:
+        if self.currentMediaNode is self.playlist.dummyTail.prev or self.currentMediaNode is None:
             return False
         self.currentMediaNode = self.currentMediaNode.next
         return True
@@ -89,7 +89,7 @@ class Player:
         bool
             True if the player successfully moved to the previous media, False otherwise.
         """
-        if self.currentMediaNode is None or self.currentMediaNode.prev is None:
+        if self.currentMediaNode is self.playlist.dummyHead.next or self.currentMediaNode is None:
             return False
         self.currentMediaNode = self.currentMediaNode.prev
         return True
@@ -180,33 +180,18 @@ class Player:
         with open(fileName, "r") as file:
             data = json.load(file)
             for media in data:
-                if "movieLength" in media:
-                    self.addMedia(Movie(media.get("collectionName"), media.get("artistName"), media.get("releaseDate"), media.get("collectionViewUrl"), media.get("contentAdvisoryRating"), media.get("trackTimeMillis")))
-                elif "duration" in media:
-                    self.addMedia(Track(media.get("collectionName"), media.get("artistName"), media.get("releaseDate"), media.get("collectionViewUrl"), media.get("trackTimeMillis")))
+                if media.get("trackTimeMillis") is None:
+                    time = 0
                 else:
-                    self.addMedia(Media(media.get("collectionName"), media.get("artistName"), media.get("releaseDate"), media.get("collectionViewUrl")))
-            if self.playlist.getSize() > 0:
-                self.currentMediaNode = self.playlist.dummyHead.next
+                    time = int(media.get("trackTimeMillis"))
+                if media.get("wrapperType") == "track" and media.get("kind") == "feature-movie":
+                    self.addMedia(Movie(title=media.get("trackName"), artist=media.get("artistName"), releaseDate=media.get("releaseDate"), url=media.get("collectionViewUrl"), rating=media.get("contentAdvisoryRating"), movieLength=time))
+                elif media.get("wrapperType") == "track" and media.get("kind") == "song":
+                    self.addMedia(Track(title=media.get("trackName"), artist=media.get("artistName"), releaseDate=media.get("releaseDate"), url=media.get("collectionViewUrl"), album=media.get("collectionName"), genre=media.get("primaryGenreName"), duration=time))
+                else:
+                    self.addMedia(Media(title=media.get("collectionName"), artist=media.get("artistName"), releaseDate=media.get("releaseDate"), url=media.get("collectionViewUrl")))
 
 if __name__ == "__main__":
-    p = Player()
-    p.loadFromJson("insert_data.json")
-    print("-------------------")
-    p.playForward()
-    print("-------------------")
-    p.playBackward()
-    print("-------------------")
-    p.play()
-    print("-------------------")
-    p.next()
-    p.play()
-    print("-------------------")
-    p.next()
-    p.play()
-    print("-------------------")
-    p.next()
-    p.play()
-    print("-------------------")
-    p.prev()
-    p.play()
+    player = Player()
+    player.loadFromJson("base_data.json")
+    player.playForward()

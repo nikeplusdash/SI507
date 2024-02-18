@@ -1,5 +1,9 @@
 class Media:
     """A class representing a media"""
+    title: str
+    artist: str
+    releaseDate: str
+    url: str
     
     def __init__(self, title = "No Title", artist = "No Artist", releaseDate = "No Release Date", url = "No URL"):
         """
@@ -64,6 +68,13 @@ class Media:
 
 class Track(Media):
     """ A class representing a music track."""
+    title: str
+    artist: str
+    releaseDate: str
+    url: str
+    album: str
+    genre: str
+    duration: int
     
     def __init__(self, title, artist, releaseDate, url, album="No Album", genre="No Genre", duration=0):
         """
@@ -100,7 +111,7 @@ class Track(Media):
         super().__init__(title, artist, releaseDate, url)
         self.album = album
         self.genre = genre
-        self.duration = duration
+        self.duration = duration / 1000
         
 
     def info(self):
@@ -139,6 +150,12 @@ class Track(Media):
 
 class Movie(Media):
     """ A class representing a movie."""
+    title: str
+    artist: str
+    releaseDate: str
+    url: str
+    rating: str
+    movieLength: int
     
     def __init__(self, title, artist, releaseDate, url, rating="No Rating", movieLength=0):
         """
@@ -171,7 +188,7 @@ class Movie(Media):
         """
         super().__init__(title, artist, releaseDate, url)
         self.rating = rating
-        self.movieLength = movieLength
+        self.movieLength = movieLength / 60000
 
         
 
