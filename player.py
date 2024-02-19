@@ -192,6 +192,4 @@ class Player:
                     self.addMedia(Media(title=media.get("collectionName"), artist=media.get("artistName"), releaseDate=media.get("releaseDate"), url=media.get("collectionViewUrl")))
 
 if __name__ == "__main__":
-    player = Player()
-    player.loadFromJson("base_data.json")
-    player.playForward()
+    pass

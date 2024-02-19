@@ -143,7 +143,7 @@ class Track(Media):
         You should include the music information along with the music length.
 
         Format:
-        <music title> by <artist> - <music album> (<release date>) length: <length> sec
+        <music title> by <artist> - <music album> (<release date>) [<genre>] length: <length> sec
         """
         print(f"{self.info()} length: {self.length()} sec")
 
