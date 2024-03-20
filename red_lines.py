@@ -438,20 +438,20 @@ class RedLines:
         print("The average rank per district shows that district A and B rank higher than district C and D. The average percentage of black population in each district grade also shows that district A and B have a lower percentage of black population than district C and D. This is further supplemented by the mean and median income discrepancy in the 4 zones (A, B, C, D), wherein Zone A & B have marginally higher income than those in Zone C & D, which shows that there is an income disaparity. This data correlation insinuates presence of redlining in the United States")
 
 def main():
-    # myRedLines = RedLines()
-    # myRedLines.createDistricts('redlines_data.json')
-    # myRedLines.plotDistricts()
-    # myRedLines.findCommonWords()
-    # myRedLines.generateRandPoint()
-    # myRedLines.fetchCensus()
-    # myRedLines.cacheData('redlines_cache.json')
-
-    myRedLines = RedLines('redlines_cache.json')
+    myRedLines = RedLines()
+    myRedLines.createDistricts('redlines_data.json')
+    myRedLines.plotDistricts()
+    myRedLines.findCommonWords()
+    myRedLines.generateRandPoint()
+    myRedLines.fetchCensus()
     myRedLines.fetchIncome()
-    myRedLines.calcIncomeStats()
-    myRedLines.calcRank()
-    myRedLines.calcPopu()
-    myRedLines.comment()
+    myRedLines.cacheData('redlines_cache.json')
+
+    # myRedLines = RedLines('redlines_cache.json')
+    # myRedLines.calcIncomeStats()
+    # myRedLines.calcRank()
+    # myRedLines.calcPopu()
+    # myRedLines.comment()
 
 if __name__ == '__main__':
     main()
