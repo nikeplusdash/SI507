@@ -211,23 +211,23 @@ class RedLines:
         'lat': xxx,'lon': xxx,'censusYear': xxx
 
         """
-        # progress = 0
-        # PROGRESS_SCALE = 10
+        progress = 0
+        PROGRESS_SCALE = 10
         for district in self.districts:
             # get census tract for each district using fetch function
-            response = get('https://geo.fcc.gov/api/census/area', params={'lat': district.randomLat, 'lon': district.randomLong, 'format': 'json'})
+            response = get('https://geo.fcc.gov/api/census/area', params={'lat': district.randomLat, 'lon': district.randomLong, 'censusYear': 2010, 'format': 'json'})
 
             if response.status_code == 200:
-                district.censusTract = response.json()['results'][0]['block_fips'][5:11]
+                district.censusTract = response.json()['results'][0]['block_fips'][2:11]
             else:
                 while response.status_code != 200:
-                    response = get('https://geo.fcc.gov/api/census/area', params={'lat': district.randomLat, 'lon': district.randomLong, 'format': 'json'})
+                    response = get('https://geo.fcc.gov/api/census/area', params={'lat': district.randomLat, 'lon': district.randomLong, 'censusYear': 2010, 'format': 'json'})
                     if response.status_code == 200:
-                        district.censusTract = response.json()['results'][0]['block_fips'][5:11]
+                        district.censusTract = response.json()['results'][0]['block_fips'][2:11]
                         break
-        #     progress += 1
-        #     print('|',''.join(["█" for _ in range(int(progress/PROGRESS_SCALE))]),''.join(["—" for _ in range(int((len(self.districts) - progress)/PROGRESS_SCALE))]), "|       ", int(progress/len(self.districts)*100)," %", sep='', end='\r')
-        # print("                                                                                ")
+            progress += 1
+            print('|',''.join(["█" for _ in range(int(progress/PROGRESS_SCALE))]),''.join(["—" for _ in range(int((len(self.districts) - progress)/PROGRESS_SCALE))]), "|       ", int(progress/len(self.districts)*100)," %", sep='', end='\r')
+        print("                                                                                ")
 
     def fetchIncome(self):
 
@@ -247,7 +247,8 @@ class RedLines:
         API_KEY = '2dd4d753356f540b4f1333f33ed71f5f6c94f0c5'
         response = get('https://api.census.gov/data/2018/acs/acs5?get=B19013_001E&for=tract:*&in=state:26&key='+API_KEY)
         income_data = response.json()
-        tract_income = {data[-1]: data[0] for data in income_data[1:]}
+        tract_income = {data[-2]+data[-1]: data[0] for data in income_data[1:]}
+
         for district in self.districts:
             district.medIncome = int(tract_income.get(district.censusTract, 0))
             if district.medIncome < 0:
@@ -370,8 +371,7 @@ class RedLines:
         API_KEY = '2dd4d753356f540b4f1333f33ed71f5f6c94f0c5'
         response = get('https://api.census.gov/data/2018/acs/acs5?get=B02001_003E,B02001_001E&for=tract:*&in=state:26&key='+API_KEY)
         population_data = response.json()
-        tract_population = {data[-1]: (int(data[0]), int(data[1])) for data in population_data[1:]}
-
+        tract_population = {data[-2]+data[-1]: (int(data[0]), int(data[1])) for data in population_data[1:]}
         for district in self.districts:
             population = tract_population.get(district.censusTract, (0, 0))
             if population[0] == 0:
@@ -382,10 +382,10 @@ class RedLines:
                 district.percent = round(population[0]/population[1]*100, 2)
             
         # aggregate and print rough percentage of black population in each district grade (A, B, C, D)
-        percent = {'A': [], 'B': [], 'C': [], 'D': []}
-        for grade in ['A', 'B', 'C', 'D']:
-            percent[grade] = [district.percent for district in self.districts if district.holcGrade == grade]
-            print(f"Rough percentage of black population in grade {grade}: {round(np.mean(percent[grade]), 2)}")
+        # percent = {'A': [], 'B': [], 'C': [], 'D': []}
+        # for grade in ['A', 'B', 'C', 'D']:
+        #     percent[grade] = [district.percent for district in self.districts if district.holcGrade == grade]
+        #     print(f"Rough percentage of black population in grade {grade}: {round(np.mean(percent[grade]), 2)}")
             
 
     def cacheData(self, fileName='redlines_cache.json'):
