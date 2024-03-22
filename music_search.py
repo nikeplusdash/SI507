@@ -1,9 +1,6 @@
-# you may use pandas only for IO reason
-# Using it to do sort will impact your grade
 import pandas as pd
 import random
 import timeit
-import codecs
 
 def timeFunc(method):
     """
@@ -14,6 +11,7 @@ def timeFunc(method):
     Callable
         A wrapper that defines the behavior of the decorated method
     """
+    # This is a pretty cool way to wrap a function and return a new function, can be great for memory management, debugging and logging
     def wrapper(*args, **kwargs):
         """
         Define the behavior of the decorated method
@@ -66,9 +64,7 @@ class MusicLibrary:
         fileName : str
             The file name of the CSV file to be read.
         """
-        # df = pd.read_csv(fileName, engine='python')
-        with codecs.open(fileName, 'r', encoding='utf-8',errors='ignore') as fdata:
-            self.data = [line.strip().split(',') for line in fdata]
+        self.data = pd.read_csv(fileName, encoding='ISO-8859-1', header=None).values.tolist()
         self.rows = len(self.data)
         self.cols = len(self.data[0])
 
@@ -173,8 +169,18 @@ class MusicLibrary:
         list
             The merged and sorted list.
         """
-        # Implementation details...
-        pass
+        sorted_list = []
+        i, j = 0, 0
+        while i < len(L) and j < len(R):
+            if L[i][keyIndex] < R[j][keyIndex]:
+                sorted_list.append(L[i])
+                i += 1
+            else:
+                sorted_list.append(R[j])
+                j += 1
+        sorted_list += L[i:]
+        sorted_list += R[j:]
+        return sorted_list
 
     @timeFunc
     def mergeSort(self, keyIndex):
@@ -187,14 +193,32 @@ class MusicLibrary:
         keyIndex : int
             The column index to sort by.
         """
-        pass
+        self.data = self._mergeSort(self.data, keyIndex)
 
     def _mergeSort(self, arr, keyIndex):
+        """
+        Sort the data using the merge sort algorithm.
+        This is the helper function for mergeSort.
+        
+        Parameters
+        ----------
+        arr : list
+            The list to sort.
+            
+        keyIndex : int
+            The column index to sort by.
 
-        # This is the helper function for merge sort.
-        # You may change the name of this function or even not have it.
-        # This is a helper method for mergeSort
-        pass
+        Returns
+        -------
+        list
+            The sorted list.
+        """
+        if len(arr) > 1:
+            M = len(arr) // 2
+            L = self._mergeSort(arr[:M], keyIndex)
+            R = self._mergeSort(arr[M:], keyIndex)
+            arr = self.merge(L, R, keyIndex)
+        return arr
 
     @timeFunc
     def quickSort(self, keyIndex):
@@ -207,20 +231,67 @@ class MusicLibrary:
         keyIndex : int
             The column index to sort by.
         """
-        # Implementation details...
-        pass
+        self.data = self._quickSort(self.data, 0, len(self.data) - 1, keyIndex)
 
-    def _quickSort(self, arr, keyIndex):
-        # This is a helper method for quickSort
-        # ...
-        pass
+    def partition(self, arr, L, R, keyIndex):
+        """
+        Partition the data into two sublists.
+        This is the helper function for quickSort.
+        
+        Parameters
+        ----------
+        arr : list
+            The list to partition.
+        
+        L: int
+            The left index of the list.
+
+        R: int
+            The right index of the list.
+        
+        keyIndex : int
+            The column index to sort by.
+        
+        Returns
+        -------
+        int
+            The index of the pivot element.
+        """
+        pivot = arr[R][keyIndex]
+        i = L - 1
+        for j in range(L, R):
+            if arr[j][keyIndex] <= pivot:
+                i += 1
+                arr[i], arr[j] = arr[j], arr[i]
+        arr[i + 1], arr[R] = arr[R], arr[i + 1]
+        return i + 1
+
+    def _quickSort(self, arr, L, R, keyIndex):
+        """
+        Sort the data using the quick sort algorithm.
+        This is the helper function for quickSort.
+        
+        Parameters
+        ----------
+        arr : list
+            The list to sort.
+        
+        keyIndex : int
+            The column index to sort by.
+        
+        Returns
+        -------
+        list
+            The sorted list.
+        """
+        if L < R:
+            pivotIndex = self.partition(arr, L, R, keyIndex)
+            self._quickSort(arr, L, pivotIndex - 1, keyIndex)
+            self._quickSort(arr, pivotIndex + 1, R, keyIndex)
+        return arr
 
     def comment(self):
-        '''
-        Based on the result you find about the run time of calling different function,
-        Write a small paragraph (more than 50 words) about time complexity, and print it. 
-        '''
-        # print(you comment)
+        print("For datasets of small size, bubble sort performs extremely quick whereas when the dataset increases, bibble sort jumps exponentially while merge sort and quick sort provide low time complexity. Merge sort and quick sort are both O(nlogn) time complexity. However, quick sort is faster than merge sort in practice. Binary search is O(logn) time complexity. Sequential search is O(n) time complexity.")
         pass
 
 
@@ -241,10 +312,13 @@ def main():
     idx = 2
     myLibrary.shuffleData()
     myLibrary.bubbleSort(keyIndex=idx)
-    # myLibrary.shuffleData()
-    # myLibrary.quickSort(keyIndex=idx)
-    # myLibrary.shuffleData()
-    # myLibrary.mergeSort(keyIndex=idx)
+
+    myLibrary.shuffleData()
+    myLibrary.quickSort(keyIndex=idx)
+
+    myLibrary.shuffleData()
+    myLibrary.mergeSort(keyIndex=idx)
+
     # myLibrary.printData()
 
 if __name__ == "__main__":
